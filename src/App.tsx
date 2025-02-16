@@ -2,7 +2,6 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import { Feature, Geometry } from "geojson";
-import L from "leaflet";
 
 const irelandBounds: [number, number][] = [
   [51.222, -10.664], // Southwest
@@ -21,8 +20,8 @@ interface CountyProperties {
   ENGTYPE_1?: string;
   CC_1?: string | null;
   HASC_1?: string;
-  COUNTY_ID: number;
-  CountyName: string;
+  COUNTY_ID: number; // NI Geo-Json
+  CountyName: string; // NI Geo-Json
 }
 
 function App() {
@@ -31,6 +30,9 @@ function App() {
     Geometry,
     CountyProperties
   > | null>(null);
+
+  let borderColor = "rgba(107,107,239,0.89)"; // Border color
+  let countyFillColour = "#c2c2e8"; // Fill color
 
   useEffect(() => {
     fetch("/ireland-counties.geojson")
@@ -78,10 +80,10 @@ function App() {
           <GeoJSON
             data={countyData}
             style={() => ({
-              color: "rgba(107,107,239,0.89)", // Border color
+              color: borderColor,
               weight: 2,
               opacity: 1,
-              fillColor: "#c2c2e8", // Fill color
+              fillColor: countyFillColour,
               fillOpacity: 0.5,
             })}
             onEachFeature={onEachFeature}
