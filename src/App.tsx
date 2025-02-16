@@ -9,22 +9,24 @@ const irelandBounds: [number, number][] = [
   [55.436, -5.996], // Northeast
 ];
 
-// Define the properties type for counties
 interface CountyProperties {
   GID_0: string;
   NAME_0: string;
   GID_1: string;
-  NAME_1: string; // The county name
-  VARNAME_1?: string;
+  NAME_1: string; // English county name
+  NAME_2: string; // Northern-Ireland counties
+  VARNAME_1?: string; // Irish County name
   NL_NAME_1?: string | null;
   TYPE_1?: string;
   ENGTYPE_1?: string;
   CC_1?: string | null;
   HASC_1?: string;
+  COUNTY_ID: number;
+  CountyName: string;
 }
 
 function App() {
-  const position: [number, number] = [53.3498, -6.2603]; // Dublin
+  const position: [number, number] = [53.3498, -6.2603]; // Dublin - starting point
   const [countyData, setCountyData] = useState<GeoJSON.FeatureCollection<
     Geometry,
     CountyProperties
@@ -34,6 +36,7 @@ function App() {
     fetch("/ireland-counties.geojson")
       .then((res) => res.json())
       .then((data: GeoJSON.FeatureCollection<Geometry, CountyProperties>) => {
+        console.log(data.features);
         setCountyData(data);
       })
       .catch((err) => console.error("Error loading GeoJSON:", err));
@@ -44,11 +47,15 @@ function App() {
     layer: L.Layer,
   ) => {
     if (feature.properties) {
-      layer.bindPopup(`<b>${feature.properties.NAME_1}</b>`);
 
-      layer.on("click", () => {
-        console.log("Clicked county:", feature.properties.NAME_1);
-      });
+      // Northern Ireland Counties
+      if(feature.properties.COUNTY_ID){
+        const formattedCountyName =  (str: string) => str.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+        layer.bindPopup(`<b>${formattedCountyName(feature.properties.CountyName)}</b>`);
+      }else{
+        // Ireland Counties
+        layer.bindPopup(`<b>${feature.properties.NAME_1}</b>`);
+      }
     }
   };
 
