@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import { Feature, Geometry } from "geojson";
+import { Button } from "./components/ui/button";
 
 const irelandBounds: [number, number][] = [
   [51.222, -10.664], // Southwest
@@ -63,6 +64,7 @@ function App() {
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
+      <Button>Hi there</Button>
       <MapContainer
         center={position}
         zoom={7}
