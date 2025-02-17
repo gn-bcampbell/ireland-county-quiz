@@ -21,10 +21,6 @@ const irelandBounds: [number, number][] = [
   [55.436, -5.996], // Northeast
 ];
 
-const formSchema = z.object({
-  countyName: z.string().min(0).max(50),
-});
-
 interface CountyProperties {
   GID_0: string;
   NAME_0: string;
@@ -50,6 +46,7 @@ export default function Map() {
   const [selectedCounties, setSelectedCounties] = useState<Set<number>>(
     new Set(),
   ); // Store selected county IDs
+  const [noCountyFound, setNoCountyFound] = useState<boolean>(false);
 
   const borderColor = "rgba(255,255,255,0.89)"; // Border color
   const defaultFillColor = "#c2c2e8"; // Default fill color
@@ -63,6 +60,10 @@ export default function Map() {
       })
       .catch((err) => console.error("Error loading GeoJSON:", err));
   }, []);
+
+  const formSchema = z.object({
+    countyName: z.string().min(0),
+  });
 
   const onEachFeature = (
     feature: Feature<Geometry, CountyProperties>,
@@ -151,7 +152,9 @@ export default function Map() {
         }
         return newSet;
       });
+      setNoCountyFound(false);
     } else {
+      setNoCountyFound(true)
       console.log("County not found");
     }
 
@@ -183,7 +186,11 @@ export default function Map() {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-xs text-gray-400" />
+                  <FormMessage className="text-xs text-gray-400">{
+                    noCountyFound && (
+                          "Not found, try again."
+                      )
+                  }</FormMessage>
                 </FormItem>
               )}
             />
