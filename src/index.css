@@ -4,6 +4,17 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Debugging utility class */
+@layer utilities {
+  .debug {
+    @apply border-[1px] border-red-500;
+  }
+
+  .debug1 {
+    @apply border-[1px] border-yellow-500;
+  }
+}
+
 :root {
   --background: hsl(0 0% 100%);
   --foreground: hsl(0 0% 3.9%);
