@@ -1,0 +1,35 @@
+# Node modules
+node_modules/
+/.turbo
+/.yarn
+.pnp.cjs
+.pnp.loader.mjs
+
+# Build output
+dist/
+
+# Vite
+.vite/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Editor settings (VS Code & JetBrains)
+.vscode/
+.idea/
+*.iml
+
+# System files
+.DS_Store
+Thumbs.db
+
+.env
+dev.env
+test.env
+qa.env
+uat.env
+prod.env
