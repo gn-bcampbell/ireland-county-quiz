@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
 import { Feature, Geometry } from "geojson";
@@ -47,6 +47,9 @@ export default function Map() {
     new Set(),
   ); // Store selected county IDs
   const [noCountyFound, setNoCountyFound] = useState<boolean>(false);
+  const [guessMessage, setGuessMessage] = useState("");
+  const [width, setWidth] = useState(window.innerWidth);
+  const [zoomLevel, setZoomLevel] = useState(width < 640 ? 6 : 7);
 
   const borderColor = "rgba(255,255,255,0.89)"; // Border color
   const defaultFillColor = "#c2c2e8"; // Default fill color
@@ -60,6 +63,32 @@ export default function Map() {
       })
       .catch((err) => console.error("Error loading GeoJSON:", err));
   }, []);
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // listener
+  useEffect(() => {
+    setZoomLevel(width < 640 ? 6 : 7);
+  }, [width]);
+
+  interface zoomProps {
+    zoomLevel: number;
+  }
+
+  // pass as function to MapContainer to manually update zoom level
+  function UpdateZoom({ zoomLevel }: zoomProps) {
+    const map = useMap();
+
+    useEffect(() => {
+      map.setZoom(zoomLevel);
+    }, [zoomLevel, map]);
+
+    return null;
+  }
 
   const formSchema = z.object({
     countyName: z.string().min(0),
@@ -76,12 +105,10 @@ export default function Map() {
       // // Convert NI counties to correct format: 'DOWN' to 'Down'
       // const formattedCountyName = (str: string) =>
       //   str.toLowerCase().replace(/^\w/, (char) => char.toUpperCase());
-
       // Bind Popup
       // const countyName = feature.properties.COUNTY_ID
       //   ? formattedCountyName(feature.properties.CountyName)
       //   : feature.properties.NAME_1;
-
       // layer.bindPopup(`<b>${countyName}</b>`);
       //
       // // Click event to toggle color
@@ -110,6 +137,9 @@ export default function Map() {
   // Define form handler
   function onSubmit(values: z.infer<typeof formSchema>) {
     let guess = values.countyName.toLowerCase();
+
+    // reset error message
+    setGuessMessage("");
 
     // handle LD having different naming conventions
     const derryVersions = [
@@ -146,7 +176,7 @@ export default function Map() {
       setSelectedCounties((prev) => {
         const newSet = new Set(prev);
         if (newSet.has(matchedCounty.countyId as number)) {
-          newSet.delete(matchedCounty.countyId as number);
+          setGuessMessage(`You've already added: ${values.countyName}`);
         } else {
           newSet.add(matchedCounty.countyId as number);
         }
@@ -154,25 +184,24 @@ export default function Map() {
       });
       setNoCountyFound(false);
     } else {
-      setNoCountyFound(true)
+      setNoCountyFound(true);
       console.log("County not found");
     }
 
     // clear form on submit
-    form.reset()
+    form.reset();
   }
-
   return (
     // Set the container width and height to be used by map container
     <div
       style={{ width: "100vw", height: "100vh" }}
-      className="flex items-center justify-center"
+      className="flex flex-col-reverse sm:flex-row items-center justify-center"
     >
-      <div className="w-1/2 max-w-sm">
+      <div className="w-full sm:w-1/2">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="m-4 space-y-2"
+            className="max-w-sm mx-auto p-4"
           >
             <FormField
               control={form.control}
@@ -181,60 +210,63 @@ export default function Map() {
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder="Enter a county name"
-                      className="w-fit my-3 px-12 text-left"
+                      placeholder="Guess a county"
+                      className="w-full my-3 text-left"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage className="text-xs text-gray-400">{
-                    noCountyFound && (
-                          "Not found, try again."
-                      )
-                  }</FormMessage>
+                  <FormMessage className="text-xs text-red-400 py-2">
+                    {noCountyFound && "Not found, try again."}
+                    {guessMessage}
+                  </FormMessage>
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-fit text-xs">
+            <Button type="submit" className="w-full text-xs">
               Guess
             </Button>
           </form>
         </Form>
       </div>
 
-      {/* Set map container, */}
-      <MapContainer
-        center={position}
-        zoom={7}
-        scrollWheelZoom={true}
-        style={{ width: "100%", height: "100%" }}
-        maxBounds={irelandBounds}
-        maxBoundsViscosity={1.0}
-      >
-        {/* Include attribution license */}
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png"
-        />
+      {/* Set map container */}
+      <div className="w-full sm:w-1/2 h-full">
+        <MapContainer
+          center={position}
+          zoom={zoomLevel}
+          scrollWheelZoom={true}
+          style={{ width: "100%", height: "100%" }}
+          maxBounds={irelandBounds}
+          maxBoundsViscosity={1.0}
+        >
+          <UpdateZoom zoomLevel={zoomLevel} />
 
-        {/* Set GeoJson tile information */}
-        {countyData && (
-          <GeoJSON
-            data={countyData}
-            style={(feature) => ({
-              color: borderColor,
-              weight: 2,
-              opacity: 1,
-              fillColor: selectedCounties.has(
-                feature?.properties?.COUNTY_ID || feature?.properties?.GID_1,
-              )
-                ? selectedFillColor
-                : defaultFillColor,
-              fillOpacity: 0.5,
-            })}
-            onEachFeature={onEachFeature}
+          {/* Include attribution license */}
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png"
           />
-        )}
-      </MapContainer>
+
+          {/* Set GeoJson tile information */}
+          {countyData && (
+            <GeoJSON
+              data={countyData}
+              style={(feature) => ({
+                color: borderColor,
+                weight: 2,
+                opacity: 1,
+                fillColor: selectedCounties.has(
+                  feature?.properties?.COUNTY_ID || feature?.properties?.GID_1,
+                )
+                  ? selectedFillColor
+                  : defaultFillColor,
+                fillOpacity: 0.5,
+              })}
+              onEachFeature={onEachFeature}
+            />
+          )}
+        </MapContainer>
+      </div>
     </div>
   );
 }
