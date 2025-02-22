@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
+import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from "@/components/ui/accordion.tsx";
 
 const irelandBounds: [number, number][] = [
   [51.222, -10.664], // Southwest
@@ -50,10 +51,19 @@ export default function Map() {
   const [guessMessage, setGuessMessage] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
   const [zoomLevel, setZoomLevel] = useState(width < 640 ? 6 : 7);
+  const [correctCounty, setCorrectCounty] = useState([''])
 
-  const borderColor = "rgba(255,255,255,0.89)"; // Border color
-  const defaultFillColor = "#c2c2e8"; // Default fill color
-  const selectedFillColor = "green"; // Selected fill color
+  const addCounty = (newCounty: string) => {
+    setCorrectCounty((prevCounties) => [...prevCounties, newCounty]);
+  };
+
+  // const clearCounties = () => {
+  //   setCorrectCounty([]);
+  // };
+
+  const borderColor = "rgba(255,255,255,0.89)";
+  const defaultFillColor = "#c2c2e8";
+  const selectedFillColor = "green";
 
   useEffect(() => {
     fetch("/ireland-counties.geojson")
@@ -179,13 +189,13 @@ export default function Map() {
           setGuessMessage(`You've already added: ${values.countyName}`);
         } else {
           newSet.add(matchedCounty.countyId as number);
+          addCounty(guess);
         }
         return newSet;
       });
       setNoCountyFound(false);
     } else {
       setNoCountyFound(true);
-      console.log("County not found");
     }
 
     // clear form on submit
@@ -195,8 +205,7 @@ export default function Map() {
     // Set the container width and height to be used by map container
     <div
       style={{ width: "100vw", height: "100vh" }}
-      className="flex flex-col-reverse sm:flex-row items-center justify-center"
-    >
+      className="flex flex-col-reverse sm:flex-row items-center justify-center">
       <div className="w-full sm:w-1/2">
         <Form {...form}>
           <form
@@ -227,6 +236,28 @@ export default function Map() {
             </Button>
           </form>
         </Form>
+
+        {/* Show correct guesses */}
+        <Accordion type="single" className="w-2/3 mx-auto" collapsible>
+          <AccordionItem value="item-1">
+            <AccordionTrigger>Correct Guesses</AccordionTrigger>
+            {correctCounty.length > 0 && (
+                <AccordionContent className="text-sm text-green-700">
+                  <ul className="flex flex-wrap">
+                    {[...new Set(correctCounty)]
+                        .sort((a, b) => a.localeCompare(b)) //alphabetical order
+                        .map((county) => (
+                            <li
+                                key={county}
+                                className='w-1/3 p-1 border-box'>
+                              {county.charAt(0).toUpperCase() + county.slice(1).toLowerCase()}
+                            </li>
+                        ))}
+                  </ul>
+                </AccordionContent>
+            )}
+          </AccordionItem>
+        </Accordion>
       </div>
 
       {/* Set map container */}
