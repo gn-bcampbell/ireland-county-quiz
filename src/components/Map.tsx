@@ -264,8 +264,13 @@ export default function Map() {
                       className="w-full my-3 text-left"
                       {...field}
                     />
+
+
                   </FormControl>
-                  <FormMessage className="text-xs text-red-400 py-2">
+                  <FormMessage className="text-xs text-red-400 pb-2">
+                    {isIrish && (
+                        <p className="text-xs text-gray-400 italic">*tacaíocht don síneadh fada ag teacht go luath</p>
+                    )}
                     {noCountyFound && "Not found, try again."}
                     {guessMessage}
                   </FormMessage>
