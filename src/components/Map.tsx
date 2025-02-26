@@ -21,16 +21,15 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion.tsx";
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { useTranslation } from 'react-i18next';
-
+} from "@/components/ui/tooltip";
+import { useTranslation } from "react-i18next";
 
 const irelandBounds: [number, number][] = [
   [51.222, -10.664], // Southwest
@@ -69,7 +68,6 @@ export default function Map() {
   const [correctCounty, setCorrectCounty] = useState([""]);
   const { t, i18n } = useTranslation();
   const [isIrish, setIsIrish] = useState<boolean>(false);
-
 
   const addCounty = (newCounty: string) => {
     setCorrectCounty((prevCounties) => [...prevCounties, newCounty]);
@@ -120,8 +118,7 @@ export default function Map() {
 
   // remove fadas from all strings
   function normalizeString(str: string): string {
-    return str.normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "");
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
   }
 
   const formSchema = z.object({
@@ -193,23 +190,22 @@ export default function Map() {
       countyId: string | number;
     };
 
-    let findCounty: County[]
-    if(isIrish){
+    let findCounty: County[];
+    if (isIrish) {
       findCounty = countyData.features.map((feature) => ({
         countyName:
-            feature.properties.CountyName?.toLowerCase() ||
-            normalizeString(feature.properties.VARNAME_1?.toLowerCase()),
+          feature.properties.CountyName?.toLowerCase() ||
+          normalizeString(feature.properties.VARNAME_1?.toLowerCase()),
         countyId: feature.properties.COUNTY_ID || feature.properties.GID_1,
       }));
-    }else{
+    } else {
       findCounty = countyData.features.map((feature) => ({
         countyName:
-            feature.properties.CountyName?.toLowerCase() ||
-            feature.properties.NAME_1?.toLowerCase(),
+          feature.properties.CountyName?.toLowerCase() ||
+          feature.properties.NAME_1?.toLowerCase(),
         countyId: feature.properties.COUNTY_ID || feature.properties.GID_1,
       }));
     }
-
 
     console.log({
       countyData: countyData,
@@ -248,11 +244,14 @@ export default function Map() {
       className="flex flex-col-reverse sm:flex-row items-center justify-center"
     >
       <div className="w-full sm:w-1/2">
-        <h1 className="flex justify-center max-w-2/3 mx-auto text-center text-wrap text-xl font-semibold">{t('welcomeMessage')}</h1>
+        <h1 className="flex justify-center max-w-2/3 mx-auto text-center text-wrap text-xl font-semibold">
+          {t("welcomeMessage")}
+        </h1>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="max-w-sm mx-auto p-4">
+            className="max-w-sm mx-auto p-4"
+          >
             <FormField
               control={form.control}
               name="countyName"
@@ -260,16 +259,16 @@ export default function Map() {
                 <FormItem>
                   <FormControl>
                     <Input
-                      placeholder={t('guessCounty')}
+                      placeholder={t("guessCounty")}
                       className="w-full my-3 text-left"
                       {...field}
                     />
-
-
                   </FormControl>
                   <FormMessage className="text-xs text-red-400 pb-2">
                     {isIrish && (
-                        <p className="text-xs text-gray-400 italic">*tacaíocht don síneadh fada ag teacht go luath</p>
+                      <p className="text-xs text-gray-400 italic">
+                        *tacaíocht don síneadh fada atá ag teacht go luath
+                      </p>
                     )}
                     {noCountyFound && "Not found, try again."}
                     {guessMessage}
@@ -278,7 +277,7 @@ export default function Map() {
               )}
             />
             <Button type="submit" className="w-full text-xs">
-              {t('guess')}
+              {t("guess")}
             </Button>
           </form>
         </Form>
@@ -288,13 +287,19 @@ export default function Map() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <RadioGroupItem value="english" id="english" onClick={() => {
-                    i18n.changeLanguage('en')
-                    setIsIrish(false)
-                  }}  />
-                  <Label htmlFor="english" className='px-2'>English</Label>
+                  <RadioGroupItem
+                    value="english"
+                    id="english"
+                    onClick={() => {
+                      i18n.changeLanguage("en");
+                      setIsIrish(false);
+                    }}
+                  />
+                  <Label htmlFor="english" className="px-2">
+                    English
+                  </Label>
                 </TooltipTrigger>
-                <TooltipContent side={'right'} className={'max-w-1/2'}>
+                <TooltipContent side={"right"} className={"max-w-1/2"}>
                   <p>Guess each county using the English spelling.</p>
                 </TooltipContent>
               </Tooltip>
@@ -304,14 +309,23 @@ export default function Map() {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger>
-                  <RadioGroupItem value="irish" id="irish" onClick={() => {
-                    setIsIrish(true);
-                    i18n.changeLanguage('ga')}
-                  } />
-                  <Label htmlFor="irish" className='px-2'>Gaeilge</Label>
+                  <RadioGroupItem
+                    value="irish"
+                    id="irish"
+                    onClick={() => {
+                      setIsIrish(true);
+                      i18n.changeLanguage("ga");
+                    }}
+                  />
+                  <Label htmlFor="irish" className="px-2">
+                    Gaeilge
+                  </Label>
                 </TooltipTrigger>
-                <TooltipContent side={'right'} className={'max-w-1/2'}>
-                  <p>Déan buille faoi thuairim go n-úsáideann gach contae an litriú Gaeilge.</p>
+                <TooltipContent side={"right"} className={"max-w-1/2"}>
+                  <p>
+                    Déan buille faoi thuairim go n-úsáideann gach contae an
+                    litriú Gaeilge.
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -321,7 +335,7 @@ export default function Map() {
         {/* Show correct guesses */}
         <Accordion type="single" className="w-2/3 mx-auto" collapsible>
           <AccordionItem value="item-1">
-            <AccordionTrigger>{t('seeCorrectGuesses')}</AccordionTrigger>
+            <AccordionTrigger>{t("seeCorrectGuesses")}</AccordionTrigger>
             {correctCounty.length > 0 && (
               <AccordionContent className="text-sm text-green-700">
                 <ul className="flex flex-wrap">
