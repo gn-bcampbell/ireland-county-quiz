@@ -29,6 +29,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
 import { useTranslation } from "react-i18next";
 
 const irelandBounds: [number, number][] = [
@@ -79,9 +91,10 @@ export default function Map() {
     });
   };
 
-  // const clearCounties = () => {
-  //   setCorrectCounty([]);
-  // };
+  const clearCounties = () => {
+    setCorrectCounty([]);
+    setSelectedCounties(new Set());
+  };
 
   const borderColor = "rgba(255,255,255,0.89)";
   const defaultFillColor = "#c2c2e8";
@@ -282,9 +295,38 @@ export default function Map() {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full text-xs">
-              {t("guess")}
-            </Button>
+            <div className="grid grid-cols-2 justify-around w-full gap-6 z-50">
+              <AlertDialog>
+                <AlertDialogTrigger>
+                  <Button
+                    type="button"
+                    variant={"destructive"}
+                    className="w-full text-xs"
+                  >
+                    {t("clearList")}
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>{t("areYouSure")}</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      {t("thisWillResetYourProgress")}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={clearCounties}>
+                      {t("clearList")}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
+              {/* Guess button */}
+              <Button type="submit" className="w-full text-xs">
+                {t("guess")}
+              </Button>
+            </div>
           </form>
         </Form>
 
@@ -357,8 +399,8 @@ export default function Map() {
             {correctCounty.length > 0 && (
               <AccordionContent className="text-sm text-green-700">
                 <ul className="flex flex-wrap">
-                  {[...new Set(correctCounty)]
-                    .sort((a, b) => a.localeCompare(b)) //alphabetical order
+                  {[...new Set(correctCounty)] // Remove duplicates and sort
+                    .sort((a, b) => a.localeCompare(b)) // Alphabetical order
                     .map((county) => (
                       <li key={county} className="w-1/3 p-1 border-box">
                         {county.charAt(0).toUpperCase() +
@@ -373,7 +415,7 @@ export default function Map() {
       </div>
 
       {/* Set map container */}
-      <div className="w-full sm:w-1/2 h-full">
+      <div className="w-full sm:w-1/2 h-full z-10">
         <MapContainer
           center={position}
           zoom={zoomLevel}

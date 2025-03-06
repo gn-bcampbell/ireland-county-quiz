@@ -12,6 +12,9 @@ const resources = {
       seeCorrectGuesses: "See your correct guesses",
       welcomeMessage:
         "Welcome to County Guess, choose your language and start guessing!",
+      areYouSure: "Are you sure?",
+      clearList: "Clear List",
+      thisWillResetYourProgress: "This will reset your progress",
     },
   },
   ga: {
@@ -25,6 +28,9 @@ const resources = {
         "Fáilte go Smaoinigh ar an contae, roghnaigh do theanga agus tosaigh ag meas!",
       supportForFadasIncoming:
         "*tacaíocht don síneadh fada atá ag teacht go luath",
+      areYouSure: "An bhfuil tú cinnte?",
+      clearList: "Tosaigh arís",
+      thisWillResetYourProgress: "Athshocróidh sé seo do dhul chun cinn",
     },
   },
 };
