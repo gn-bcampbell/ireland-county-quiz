@@ -400,7 +400,7 @@ export default function Map() {
         </RadioGroup>
 
         {/* Show correct guesses */}
-        <Accordion type="single" className="w-2/3 mx-auto" collapsible>
+        <Accordion type="single" className="w-2/3 mx-auto mb-6" collapsible>
           <AccordionItem value="item-1">
             <AccordionTrigger>
               {t("seeCorrectGuesses")}
@@ -431,6 +431,18 @@ export default function Map() {
             )}
           </AccordionItem>
         </Accordion>
+
+        <p className="fixed bottom-0 text-xs p-2 pt-10">
+          Built by
+          <a
+            className="italic text-purple-500 px-1 hover:underline-offset-2 hover:underline"
+            href="https://www.brendancampbell.dev"
+            target="_blank"
+          >
+            Brendan Campbell
+          </a>
+          I hope you like it!
+        </p>
       </div>
 
       {/* Set map container */}
