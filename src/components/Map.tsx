@@ -65,12 +65,18 @@ export default function Map() {
   const [guessMessage, setGuessMessage] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
   const [zoomLevel, setZoomLevel] = useState(width < 640 ? 6 : 7);
-  const [correctCounty, setCorrectCounty] = useState([""]);
+  const [correctCounty, setCorrectCounty] = useState<string[]>([]);
   const { t, i18n } = useTranslation();
   const [isIrish, setIsIrish] = useState<boolean>(false);
 
   const addCounty = (newCounty: string) => {
-    setCorrectCounty((prevCounties) => [...prevCounties, newCounty]);
+    setCorrectCounty((prevCounties) => {
+      // Only add the newCounty if it doesn't already exist in the array
+      if (!prevCounties.includes(newCounty)) {
+        return [...prevCounties, newCounty];
+      }
+      return prevCounties; // return the array as is if the county already exists
+    });
   };
 
   // const clearCounties = () => {
@@ -335,7 +341,19 @@ export default function Map() {
         {/* Show correct guesses */}
         <Accordion type="single" className="w-2/3 mx-auto" collapsible>
           <AccordionItem value="item-1">
-            <AccordionTrigger>{t("seeCorrectGuesses")}</AccordionTrigger>
+            <AccordionTrigger>
+              {t("seeCorrectGuesses")}
+              {correctCounty.length === 32 ? (
+                <span className={`float-end text-green-600`}>
+                  {correctCounty.length} / 32{" "}
+                  <span className={"pl-2 text-lg animate-pulse"}>🎉</span>
+                </span>
+              ) : (
+                <span className={`float-end text-gray-500}`}>
+                  {correctCounty.length} / 32
+                </span>
+              )}
+            </AccordionTrigger>
             {correctCounty.length > 0 && (
               <AccordionContent className="text-sm text-green-700">
                 <ul className="flex flex-wrap">
