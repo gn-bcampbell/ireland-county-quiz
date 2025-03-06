@@ -433,7 +433,7 @@ export default function Map() {
         </Accordion>
 
         <p className="fixed bottom-0 text-xs p-2 pt-10">
-          Built by
+          Created by
           <a
             className="italic text-purple-500 px-1 hover:underline-offset-2 hover:underline"
             href="https://www.brendancampbell.dev"
