@@ -70,16 +70,27 @@ export default function Map() {
     Geometry,
     CountyProperties
   > | null>(null);
-  const [selectedCounties, setSelectedCounties] = useState<Set<number>>(
-    new Set(),
-  ); // Store selected county IDs
   const [noCountyFound, setNoCountyFound] = useState<boolean>(false);
   const [guessMessage, setGuessMessage] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
   const [zoomLevel, setZoomLevel] = useState(width < 640 ? 6 : 7);
-  const [correctCounty, setCorrectCounty] = useState<string[]>([]);
   const { t, i18n } = useTranslation();
   const [isIrish, setIsIrish] = useState<boolean>(false);
+  const [selectedCounties, setSelectedCounties] = useState<Set<number>>(
+      () => new Set(JSON.parse(localStorage.getItem('selectedCounties') || '[]'))
+  );
+  const [correctCounty, setCorrectCounty] = useState<string[]>(
+      () => JSON.parse(localStorage.getItem('correctCounty') || '[]')
+  );
+
+  useEffect(() => {
+    localStorage.setItem('selectedCounties', JSON.stringify([...selectedCounties]));
+  }, [selectedCounties]);
+
+  useEffect(() => {
+    localStorage.setItem('correctCounty', JSON.stringify(correctCounty));
+  }, [correctCounty]);
+
 
   const addCounty = (newCounty: string) => {
     setCorrectCounty((prevCounties) => {
