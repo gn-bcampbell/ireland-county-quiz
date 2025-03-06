@@ -13,7 +13,7 @@ const resources = {
       welcomeMessage:
         "Welcome to County Guess, choose your language and start guessing!",
       areYouSure: "Are you sure?",
-      clearList: "Clear List",
+      clearList: "Restart",
       thisWillResetYourProgress: "This will reset your progress",
     },
   },

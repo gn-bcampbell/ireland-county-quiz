@@ -42,6 +42,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 import { useTranslation } from "react-i18next";
+import ReactConfetti from "react-confetti";
 
 const irelandBounds: [number, number][] = [
   [51.222, -10.664], // Southwest
@@ -73,24 +74,27 @@ export default function Map() {
   const [noCountyFound, setNoCountyFound] = useState<boolean>(false);
   const [guessMessage, setGuessMessage] = useState("");
   const [width, setWidth] = useState(window.innerWidth);
+  const [height] = useState(window.innerHeight);
   const [zoomLevel, setZoomLevel] = useState(width < 640 ? 6 : 7);
   const { t, i18n } = useTranslation();
   const [isIrish, setIsIrish] = useState<boolean>(false);
   const [selectedCounties, setSelectedCounties] = useState<Set<number>>(
-      () => new Set(JSON.parse(localStorage.getItem('selectedCounties') || '[]'))
+    () => new Set(JSON.parse(localStorage.getItem("selectedCounties") || "[]")),
   );
-  const [correctCounty, setCorrectCounty] = useState<string[]>(
-      () => JSON.parse(localStorage.getItem('correctCounty') || '[]')
+  const [correctCounty, setCorrectCounty] = useState<string[]>(() =>
+    JSON.parse(localStorage.getItem("correctCounty") || "[]"),
   );
 
   useEffect(() => {
-    localStorage.setItem('selectedCounties', JSON.stringify([...selectedCounties]));
+    localStorage.setItem(
+      "selectedCounties",
+      JSON.stringify([...selectedCounties]),
+    );
   }, [selectedCounties]);
 
   useEffect(() => {
-    localStorage.setItem('correctCounty', JSON.stringify(correctCounty));
+    localStorage.setItem("correctCounty", JSON.stringify(correctCounty));
   }, [correctCounty]);
-
 
   const addCounty = (newCounty: string) => {
     setCorrectCounty((prevCounties) => {
@@ -273,6 +277,10 @@ export default function Map() {
       style={{ width: "100vw", height: "100vh" }}
       className="flex flex-col-reverse sm:flex-row items-center justify-center"
     >
+      {correctCounty.length === 32 && (
+        <ReactConfetti width={width} height={height} />
+      )}
+
       <div className="w-full sm:w-1/2">
         <h1 className="flex justify-center max-w-2/3 mx-auto text-center text-wrap text-xl font-semibold">
           {t("welcomeMessage")}
@@ -402,7 +410,7 @@ export default function Map() {
                   <span className={"pl-2 text-lg animate-pulse"}>🎉</span>
                 </span>
               ) : (
-                <span className={`float-end text-gray-500}`}>
+                <span className={`float-end text-gray-400`}>
                   {correctCounty.length} / 32
                 </span>
               )}
