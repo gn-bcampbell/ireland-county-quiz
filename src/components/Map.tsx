@@ -435,7 +435,7 @@ export default function Map() {
         <p className="fixed bottom-0 text-xs p-2 pt-10">
           Created by
           <a
-            className="italic text-purple-500 px-1 hover:underline-offset-2 hover:underline"
+            className="font-semibold text-green-700 px-1 hover:underline-offset-2 hover:underline"
             href="https://www.brendancampbell.dev"
             target="_blank"
           >
